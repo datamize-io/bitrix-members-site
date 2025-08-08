@@ -1,0 +1,396 @@
+<!-- ===== DOC 2C: CONTEÚDO "TUTORIAIS" (USAR EM /members/tutorials/) ===== -->
+<!-- /* Este é o segundo documento da página. O primeiro documento é a SIDEBAR fixa (DOC 1). */ -->
+<script>
+  const TUTORIALS_JSON = [{ id: "DVhSGwyhb48" } /* título/thumbnail via oEmbed; sem descrição oficial */];
+</script>
+<section id="mx-tutorials-root" style="padding: 24px 24px 40px">
+  <style>
+    #mx-tutorials-root .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      padding: 28px;
+    }
+    #mx-tutorials-root .title {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #1f1f1f;
+    }
+    #mx-tutorials-root .sub {
+      margin: 0 0 18px;
+      color: #6b7280;
+    }
+    #mx-tutorials-root .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    #mx-tutorials-root .input {
+      flex: 1 1 260px;
+      background: #eef0f5;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+    #mx-tutorials-root .input:focus {
+      outline: 4px solid rgba(108, 43, 255, 0.25);
+      background: #fff;
+    }
+    #mx-tutorials-root .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    #mx-tutorials-root .card-tut {
+      border: 1px solid #eceff4;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    #mx-tutorials-root .thumb {
+      aspect-ratio: 16/9;
+      background: #f3f4f6;
+    }
+    #mx-tutorials-root .body {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #mx-tutorials-root .t-title {
+      font-weight: 800;
+    }
+    #mx-tutorials-root .t-desc {
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    #mx-tutorials-root .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: #6c2bff;
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    #mx-tutorials-root .btn.secondary {
+      background: #f3f4f6;
+      color: #111;
+    }
+    #mx-tutorials-root .rowb {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #mx-tutorials-root .badge {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    #mx-tutorials-root .alert {
+      display: none;
+      margin-top: 12px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    #mx-tutorials-root .alert.show {
+      display: block;
+    }
+    #mx-tutorials-root .alert.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    #mx-tutorials-root .alert.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    #mx-tutorials-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.55);
+      backdrop-filter: blur(2px);
+      display: none;
+      z-index: 9999;
+      padding: 20px;
+    }
+    #mx-tutorials-modal .box {
+      max-width: 980px;
+      margin: 4vh auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px;
+    }
+    #mx-tutorials-modal iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: 0;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+  </style>
+
+  <div class="card">
+    <h1 class="title">Tutoriais</h1>
+    <div class="sub">Gerenciado por um JSON local com slugs do YouTube.</div>
+
+    <div class="row">
+      <input id="mx-search" class="input" placeholder="Pesquisar por título/descrição..." />
+      <button id="mx-refresh" class="btn secondary">Recarregar</button>
+    </div>
+
+    <div id="mx-grid" class="grid"></div>
+    <div id="mx-alert" class="alert"></div>
+  </div>
+</section>
+
+<!-- Modal do player -->
+<div id="mx-tutorials-modal" aria-hidden="true">
+  <div class="box">
+    <div class="rowb" style="margin-bottom: 8px">
+      <strong id="mx-modal-title">Assistir</strong>
+      <button id="mx-modal-close" class="btn secondary">Fechar</button>
+    </div>
+    <iframe id="mx-modal-iframe" allowfullscreen title="Tutorial"></iframe>
+  </div>
+</div>
+
+<script data-skip-moving="true">
+  /* /* Este script é o DOC 2C (Conteúdo). O DOC 1 é a SIDEBAR fixa incluída em outra seção. */
+
+  /* ========= CONFIG ========= */
+  /* /* Coloque aqui seu JSON “banco de dados”. Pode ser inline ou carregar de um arquivo .json via fetch.
+        Cada item pode ter só o id (slug do YouTube). Se quiser forçar uma descrição sem usar API, inclua "description". */
+
+  /*{ id: "ysz5S6PUM-U", description: "Perfil e configurações" },
+  /*{ id: "76979871", provider: "vimeo" }                    /* opcional: suporta vimeo em modo simples */
+
+  /* /* Opcional: se você tiver a YouTube Data API key, coloque aqui para puxar a descrição oficial. */
+  const YOUTUBE_API_KEY = ""; /* deixe vazio para operar sem API */
+
+  /* ========= HELPERS UI ========= */
+  const $T = (s, r = document) => r.querySelector(s);
+  const $$T = (s, r = document) => [...r.querySelectorAll(s)];
+  const alertBox = $T("#mx-alert");
+  function showAlert(msg, type = "success") {
+    alertBox.className = `alert show ${type}`;
+    alertBox.textContent = msg;
+  }
+  function clearAlert() {
+    alertBox.className = "alert";
+    alertBox.textContent = "";
+  }
+
+  /* /* Progresso local por usuário — salva no localStorage.
+        Chave: mx:tutorials:progress:<user_or_guest>  */
+  function getUserKey() {
+    try {
+      const email = document.querySelector("#meso-user-email")?.textContent?.trim() || "guest";
+      return email || "guest";
+    } catch (_) {
+      return "guest";
+    }
+  }
+  function getProgress() {
+    const key = `mx:tutorials:progress:${getUserKey()}`;
+    try {
+      return JSON.parse(localStorage.getItem(key)) || {};
+    } catch (_) {
+      return {};
+    }
+  }
+  function setProgress(map) {
+    const key = `mx:tutorials:progress:${getUserKey()}`;
+    localStorage.setItem(key, JSON.stringify(map));
+  }
+
+  /* ========= METADADOS ========= */
+  async function fetchOEmbedYouTube(id) {
+    /* /* Sem API key: obtemos título e thumbnail via oEmbed */
+    const url = `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent("https://www.youtube.com/watch?v=" + id)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("oEmbed YouTube falhou");
+    const j = await res.json();
+    return {
+      id,
+      provider: "youtube",
+      title: j.title,
+      thumbnail: j.thumbnail_url,
+      description: "" /* oEmbed não fornece descrição */,
+    };
+  }
+
+  async function fetchYouTubeAPI(id) {
+    /* /* Com API key: pega título + descrição oficiais */
+    const api = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${id}&key=${YOUTUBE_API_KEY}`;
+    const res = await fetch(api);
+    if (!res.ok) throw new Error("YouTube API falhou");
+    const j = await res.json();
+    const it = (j.items && j.items[0] && j.items[0].snippet) || {};
+    return {
+      id,
+      provider: "youtube",
+      title: it.title || "Vídeo",
+      thumbnail:
+        (it.thumbnails && (it.thumbnails.maxres?.url || it.thumbnails.high?.url || it.thumbnails.default?.url)) || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+      description: it.description || "",
+    };
+  }
+
+  async function fetchOEmbedVimeo(id) {
+    const url = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent("https://vimeo.com/" + id)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("oEmbed Vimeo falhou");
+    const j = await res.json();
+    return {
+      id,
+      provider: "vimeo",
+      title: j.title,
+      thumbnail: j.thumbnail_url,
+      description: j.description || "",
+    };
+  }
+
+  async function enrichItem(item) {
+    /* /* Decide a fonte (YouTube/Vimeo) e como buscar metadados */
+    const prov = item.provider || "youtube";
+    if (prov === "vimeo") {
+      const base = await fetchOEmbedVimeo(item.id);
+      return { ...base, description: item.description ?? base.description ?? "" };
+    }
+    /* YouTube */
+    try {
+      if (YOUTUBE_API_KEY) {
+        const full = await fetchYouTubeAPI(item.id);
+        return { ...full };
+      }
+      const base = await fetchOEmbedYouTube(item.id);
+      /* sem API: preserve description do JSON se fornecida */
+      return { ...base, description: item.description ?? "" };
+    } catch (_) {
+      /* fallback bruto só com thumb */
+      return {
+        id: item.id,
+        provider: "youtube",
+        title: "Vídeo",
+        thumbnail: `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`,
+        description: item.description ?? "",
+      };
+    }
+  }
+
+  async function buildList() {
+    clearAlert();
+    const grid = $T("#mx-grid");
+    grid.innerHTML = "";
+
+    /* carrega metadados de todos os itens declarados no JSON */
+    const items = await Promise.all(TUTORIALS_JSON.map(enrichItem));
+
+    /* filtro */
+    const q = ($T("#mx-search").value || "").toLowerCase().trim();
+    const filtered = items.filter((x) => (x.title || "").toLowerCase().includes(q) || (x.description || "").toLowerCase().includes(q));
+
+    if (filtered.length === 0) {
+      showAlert("Nenhum tutorial encontrado.", "error");
+      return;
+    }
+
+    const progress = getProgress();
+
+    filtered.forEach((it) => {
+      const card = document.createElement("div");
+      card.className = "card-tut";
+
+      const img = document.createElement("img");
+      img.className = "thumb";
+      img.src = it.thumbnail;
+      img.alt = it.title;
+
+      const body = document.createElement("div");
+      body.className = "body";
+
+      const h = document.createElement("div");
+      h.className = "t-title";
+      h.textContent = it.title;
+
+      const d = document.createElement("div");
+      d.className = "t-desc";
+      d.textContent = it.description || "";
+
+      const rowb = document.createElement("div");
+      rowb.className = "rowb";
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = progress[it.id] ? "Concluído" : "Pendente";
+
+      const open = document.createElement("button");
+      open.className = "btn";
+      open.textContent = "Assistir";
+      open.addEventListener("click", () => openModal(it));
+
+      const toggle = document.createElement("button");
+      toggle.className = "btn secondary";
+      toggle.textContent = progress[it.id] ? "Marcar como não concluído" : "Marcar como concluído";
+      toggle.addEventListener("click", () => {
+        const map = getProgress();
+        map[it.id] = !map[it.id];
+        setProgress(map);
+        buildList();
+      });
+
+      rowb.appendChild(badge);
+      rowb.appendChild(open);
+
+      body.appendChild(h);
+      body.appendChild(d);
+      body.appendChild(rowb);
+      body.appendChild(toggle);
+
+      card.appendChild(img);
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+  }
+
+  /* ========= MODAL ========= */
+  const modal = $T("#mx-tutorials-modal");
+  function openModal(it) {
+    $T("#mx-modal-title").textContent = it.title || "Assistir";
+    const src = it.provider === "vimeo" ? `https://player.vimeo.com/video/${it.id}` : `https://www.youtube.com/embed/${it.id}`;
+    $T("#mx-modal-iframe").src = src;
+    modal.style.display = "block";
+    modal.setAttribute("aria-hidden", "false");
+  }
+  function closeModal() {
+    $T("#mx-modal-iframe").src = "";
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+  $T("#mx-modal-close")?.addEventListener("click", closeModal);
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  /* ========= Eventos ========= */
+  $T("#mx-refresh")?.addEventListener("click", buildList);
+  $T("#mx-search")?.addEventListener("input", buildList);
+
+  /* ========= Start ========= */
+  (async () => {
+    await buildList();
+  })();
+</script>
+<!-- ===== FIM DO DOC 2C (Tutoriais) ===== -->

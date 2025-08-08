@@ -1,0 +1,103 @@
+<!-- ===== DOC 2A: CONTEÚDO "MEUS NEGÓCIOS" (USAR EM /members/deals/) ===== -->
+<section id="mx-deals-root" style="padding: 24px 24px 40px">
+  <style>
+    #mx-deals-root .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      padding: 28px;
+    }
+    #mx-deals-root .title {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #1f1f1f;
+    }
+    #mx-deals-root .sub {
+      margin: 0 0 18px;
+      color: #6b7280;
+    }
+    #mx-deals-root .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: #6c2bff;
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    #mx-deals-root ul {
+      list-style: none;
+      margin: 16px 0 0;
+      padding: 0;
+    }
+    #mx-deals-root li {
+      border: 1px solid #eceff4;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #mx-deals-root .empty {
+      color: #6b7280;
+      margin-top: 8px;
+    }
+  </style>
+
+  <div class="card">
+    <h1 class="title">Meus negócios</h1>
+    <div class="sub">Listagem dos seus deals.</div>
+    <button id="mx-reload-deals" class="btn">Recarregar</button>
+
+    <ul id="mx-deals-list"></ul>
+    <div id="mx-deals-empty" class="empty" style="display: none">Nenhum negócio encontrado.</div>
+  </div>
+</section>
+
+<script data-skip-moving="true">
+  /* Supõe que o DOC 1 já criou window.supabaseClient */
+  async function loadDeals() {
+    const list = document.getElementById("mx-deals-list");
+    const empty = document.getElementById("mx-deals-empty");
+    list.innerHTML = "";
+    empty.style.display = "none";
+
+    try {
+      /* Ajuste a tabela conforme seu schema/RLS */
+      const { data, error } = await window.supabaseClient.from("deals").select("id,title,status,created_at").order("created_at", { ascending: false });
+
+      if (error) {
+        console.warn("deals error:", error.message);
+      }
+
+      const rows = data || [];
+      if (rows.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+
+      rows.forEach((d) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${d.title || "Sem título"}</strong><span style="color:#6b7280">${d.status || "—"}</span>`;
+        list.appendChild(li);
+      });
+    } catch (e) {
+      console.error(e);
+      empty.style.display = "block";
+    }
+  }
+
+  document.getElementById("mx-reload-deals")?.addEventListener("click", loadDeals);
+
+  /* Carrega ao abrir a página */
+  (async () => {
+    const {
+      data: { session },
+    } = await window.supabaseClient.auth.getSession();
+    if (!session) return;
+    loadDeals();
+  })();
+</script>
+<!-- ===== FIM DO DOC 2A (Meus negócios) ===== -->

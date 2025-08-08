@@ -1,0 +1,145 @@
+<!-- ===== DOC 2B: CONTEÚDO "MEU PERFIL" (USAR EM /members/profile/) ===== -->
+<section id="mx-profile-root" style="padding: 24px 24px 40px">
+  <style>
+    #mx-profile-root .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      padding: 28px;
+    }
+    #mx-profile-root .title {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #1f1f1f;
+    }
+    #mx-profile-root .sub {
+      margin: 0 0 18px;
+      color: #6b7280;
+    }
+    #mx-profile-root .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    #mx-profile-root .input {
+      width: 100%;
+      background: #eef0f5;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+    #mx-profile-root .input:focus {
+      outline: 4px solid rgba(108, 43, 255, 0.25);
+      background: #fff;
+    }
+    #mx-profile-root .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: #6c2bff;
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    #mx-profile-root .alert {
+      display: none;
+      margin-top: 12px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    #mx-profile-root .alert.show {
+      display: block;
+    }
+    #mx-profile-root .alert.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    #mx-profile-root .alert.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    @media (max-width: 960px) {
+      #mx-profile-root .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="card">
+    <h1 class="title">Meu perfil</h1>
+    <div class="sub">Atualize seus dados básicos.</div>
+
+    <form id="mx-profile-form">
+      <div class="grid">
+        <div>
+          <label>Nome completo</label>
+          <input class="input" id="mx-name" placeholder="Seu nome" />
+        </div>
+        <div>
+          <label>Telefone</label>
+          <input class="input" id="mx-phone" placeholder="+55 11 99999-9999" />
+        </div>
+      </div>
+
+      <div style="margin-top: 14px">
+        <label>Empresa</label>
+        <input class="input" id="mx-company" placeholder="Opcional" />
+      </div>
+
+      <div style="margin-top: 16px">
+        <button class="btn" type="submit">Salvar mudanças</button>
+      </div>
+
+      <div id="mx-profile-alert" class="alert"></div>
+    </form>
+  </div>
+</section>
+
+<script data-skip-moving="true">
+  const alertEl = document.getElementById("mx-profile-alert");
+  function showAlert(msg, type = "success") {
+    alertEl.className = `alert show ${type}`;
+    alertEl.textContent = msg;
+  }
+  function clearAlert() {
+    alertEl.className = "alert";
+    alertEl.textContent = "";
+  }
+
+  /* Preenche com metadata do usuário */
+  (async function fill() {
+    const {
+      data: { session },
+    } = await window.supabaseClient.auth.getSession();
+    if (!session) return;
+    const u = session.user;
+    document.getElementById("mx-name").value = u.user_metadata?.full_name || "";
+    document.getElementById("mx-phone").value = u.user_metadata?.phone || "";
+    document.getElementById("mx-company").value = u.user_metadata?.company || "";
+  })();
+
+  /* Salvar */
+  document.getElementById("mx-profile-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearAlert();
+    const full_name = document.getElementById("mx-name").value.trim();
+    const phone = document.getElementById("mx-phone").value.trim();
+    const company = document.getElementById("mx-company").value.trim();
+    try {
+      const { error } = await window.supabaseClient.auth.updateUser({ data: { full_name, phone, company } });
+      if (error) {
+        showAlert(error.message || "Falha ao salvar.", "error");
+        return;
+      }
+      showAlert("Perfil atualizado com sucesso.", "success");
+    } catch (_) {
+      showAlert("Erro de rede. Tente novamente.", "error");
+    }
+  });
+</script>
+<!-- ===== FIM DO DOC 2B (Meu perfil) ===== -->

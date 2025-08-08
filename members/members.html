@@ -1,0 +1,387 @@
+<!-- ===== Members (BitrixSites HTML Block) ===== -->
+<div id="meso-members-root">
+  <style>
+    :root {
+      --meso-primary: #6c2bff;
+      --meso-bg: #f5f6fb;
+      --meso-text: #1f1f1f;
+      --meso-muted: #6b7280;
+      --meso-white: #fff;
+      --meso-radius-lg: 20px;
+      --meso-radius-sm: 10px;
+      --meso-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+      --meso-shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    #meso-members-root * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .meso-shell {
+      min-height: 70vh;
+      background: var(--meso-bg);
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      padding: 24px;
+    }
+    .meso-side {
+      background: var(--meso-white);
+      border-radius: 16px;
+      box-shadow: var(--meso-shadow-md);
+      padding: 18px 14px;
+      position: relative;
+    }
+    .meso-side .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      color: var(--meso-text);
+      margin: 2px 6px 14px;
+      font-size: 18px;
+    }
+    .meso-side .collapse {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      border: 0;
+      background: #f3f4f6;
+      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+    }
+    .meso-side nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 12px;
+      border-radius: 10px;
+      color: #111827;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .meso-side nav a:hover {
+      background: #f3f4f6;
+    }
+    .meso-side nav a.active {
+      background: var(--meso-primary);
+      color: #fff;
+    }
+    .meso-main {
+      min-width: 0;
+    }
+    .meso-card {
+      background: var(--meso-white);
+      border-radius: var(--meso-radius-lg);
+      box-shadow: var(--meso-shadow-lg);
+      padding: 28px;
+    }
+    .meso-title {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--meso-text);
+    }
+    .meso-sub {
+      margin: 0 0 22px;
+      color: var(--meso-muted);
+    }
+    .meso-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .meso-input {
+      width: 100%;
+      background: #eef0f5;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+    .meso-input:focus {
+      outline: 4px solid rgba(108, 43, 255, 0.25);
+      background: #fff;
+    }
+    .meso-btn {
+      display: inline-block;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: var(--meso-primary);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .meso-btn.secondary {
+      background: #f3f4f6;
+      color: #111;
+    }
+    .meso-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .meso-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .meso-item {
+      border: 1px solid #eceff4;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .meso-alert {
+      display: none;
+      margin-top: 12px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    .meso-alert.show {
+      display: block;
+    }
+    .meso-alert.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .meso-alert.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .meso-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .meso-user {
+      color: var(--meso-muted);
+      font-size: 14px;
+    }
+    .meso-side.collapsed {
+      width: 78px;
+    }
+    .meso-side.collapsed nav a span {
+      display: none;
+    }
+    @media (max-width: 960px) {
+      .meso-shell {
+        grid-template-columns: 1fr;
+      }
+      .meso-side {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        top: 16px;
+        z-index: 30;
+      }
+      .meso-main {
+        margin-top: 86px;
+      }
+    }
+  </style>
+
+  <div class="meso-shell">
+    <aside class="meso-side" id="meso-side">
+      <button class="collapse" id="meso-collapse" aria-label="Contrair menu">≡</button>
+      <div class="brand">Datamize</div>
+      <nav>
+        <a href="#negocios" id="nav-negocios" class="active">🗂️ <span>Meus negócios</span></a>
+        <a href="#perfil" id="nav-perfil">👤 <span>Meu perfil</span></a>
+      </nav>
+    </aside>
+
+    <main class="meso-main">
+      <div class="meso-topbar">
+        <div>
+          <h1 class="meso-title" id="meso-page-title">Meus negócios</h1>
+          <div class="meso-sub">Área do cliente</div>
+        </div>
+        <div class="meso-row">
+          <span class="meso-user" id="meso-user-email">—</span>
+          <button class="meso-btn secondary" id="meso-logout">Sair</button>
+        </div>
+      </div>
+
+      <!-- Abas -->
+      <section id="tab-negocios" class="meso-card">
+        <div class="meso-row" style="margin-bottom: 10px">
+          <button class="meso-btn" id="reload-deals">Recarregar</button>
+        </div>
+        <ul class="meso-list" id="deals-list"></ul>
+        <div class="meso-sub" id="deals-empty" style="display: none">Nenhum negócio encontrado ainda.</div>
+      </section>
+
+      <section id="tab-perfil" class="meso-card" style="display: none">
+        <form id="form-profile">
+          <div class="meso-grid">
+            <div>
+              <label>Nome completo</label>
+              <input class="meso-input" id="profile-name" placeholder="Seu nome" />
+            </div>
+            <div>
+              <label>Telefone</label>
+              <input class="meso-input" id="profile-phone" placeholder="+55 11 99999-9999" />
+            </div>
+          </div>
+          <div style="margin-top: 14px">
+            <label>Empresa</label>
+            <input class="meso-input" id="profile-company" placeholder="Opcional" />
+          </div>
+          <div class="meso-row" style="margin-top: 16px">
+            <button class="meso-btn" type="submit" id="save-profile">Salvar mudanças</button>
+          </div>
+          <div id="profile-alert" class="meso-alert"></div>
+        </form>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Supabase SDK -->
+<script data-skip-moving="true" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-skip-moving="true">
+  /* ===== CONFIG SUPABASE ===== */
+  const SUPABASE_URL = "https://khwttbscnemvunywcepu.supabase.co";
+  const SUPABASE_ANON = "COLE_SUA_ANON_KEY_AQUI";
+  const LOGIN_URL = "https://datamize24.bitrix24.site/"; /* página de login */
+  const MEMBERS_URL = "https://datamize24.bitrix24.site/members/"; /* esta página   */
+
+  /* Garante headers com apikey em todas as requisições */
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+    global: { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` } },
+  });
+
+  /* ===== HELPERS UI ===== */
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const showAlert = (el, msg, type = "success") => {
+    el.className = `meso-alert show ${type}`;
+    el.textContent = msg;
+  };
+  const clearAlert = (el) => {
+    el.className = "meso-alert";
+    el.textContent = "";
+  };
+
+  /* ===== Guard de sessão ===== */
+  (async function guard() {
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+    if (!session) {
+      location.href = LOGIN_URL;
+      return;
+    }
+    const user = session.user;
+    $("#meso-user-email").textContent = user.email || "—";
+    /* Carrega perfil do metadata (se tiver) */
+    $("#profile-name").value = user.user_metadata?.full_name || "";
+    $("#profile-phone").value = user.user_metadata?.phone || "";
+    $("#profile-company").value = user.user_metadata?.company || "";
+    /* Carregar negócios ao entrar */
+    await loadDeals(user);
+  })();
+
+  /* Redireciona ao deslogar */
+  $("#meso-logout")?.addEventListener("click", async function () {
+    await supabaseClient.auth.signOut();
+    location.href = LOGIN_URL;
+  });
+
+  /* ===== Menu/Abas ===== */
+  $("#meso-collapse")?.addEventListener("click", function () {
+    $("#meso-side").classList.toggle("collapsed");
+  });
+  $("#nav-negocios")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    setTab("negocios");
+  });
+  $("#nav-perfil")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    setTab("perfil");
+  });
+  function setTab(tab) {
+    $$("#meso-side nav a").forEach((a) => a.classList.remove("active"));
+    if (tab === "negocios") {
+      $("#nav-negocios").classList.add("active");
+      $("#tab-negocios").style.display = "block";
+      $("#tab-perfil").style.display = "none";
+      $("#meso-page-title").textContent = "Meus negócios";
+    } else {
+      $("#nav-perfil").classList.add("active");
+      $("#tab-negocios").style.display = "none";
+      $("#tab-perfil").style.display = "block";
+      $("#meso-page-title").textContent = "Meu perfil";
+    }
+  }
+
+  /* ===== Meus Negócios =====
+     Espera uma tabela pública (RLS habilitado) chamada 'deals'
+     com colunas: id (uuid), title (text), status (text), owner (uuid).
+     RLS exemplo:
+       create policy "owner can read"
+       on deals for select using (auth.uid() = owner);
+  */
+  async function loadDeals(user) {
+    const list = $("#deals-list");
+    list.innerHTML = "";
+    $("#deals-empty").style.display = "none";
+    try {
+      const { data, error } = await supabaseClient.from("deals").select("id,title,status,created_at").order("created_at", { ascending: false });
+      /* Se não existir tabela/política, apenas mostra vazio */
+      if (error) {
+        console.warn("deals error:", error.message);
+      }
+      const rows = data || [];
+      if (rows.length === 0) {
+        $("#deals-empty").style.display = "block";
+        return;
+      }
+      rows.forEach((d) => {
+        const li = document.createElement("li");
+        li.className = "meso-item";
+        li.innerHTML = `<strong>${d.title || "Sem título"}</strong><span style="color:#6b7280">${d.status || "—"}</span>`;
+        list.appendChild(li);
+      });
+    } catch (e) {
+      console.error(e);
+      $("#deals-empty").style.display = "block";
+    }
+  }
+  $("#reload-deals")?.addEventListener("click", async function () {
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+    if (session?.user) loadDeals(session.user);
+  });
+
+  /* ===== Meu perfil (metadata do usuário) ===== */
+  $("#form-profile")?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    clearAlert($("#profile-alert"));
+    const full_name = $("#profile-name").value.trim();
+    const phone = $("#profile-phone").value.trim();
+    const company = $("#profile-company").value.trim();
+    try {
+      const { error } = await supabaseClient.auth.updateUser({ data: { full_name, phone, company } });
+      if (error) {
+        showAlert($("#profile-alert"), error.message || "Falha ao salvar.", "error");
+        return;
+      }
+      showAlert($("#profile-alert"), "Perfil atualizado com sucesso.", "success");
+    } catch (err) {
+      showAlert($("#profile-alert"), "Erro de rede. Tente novamente.", "error");
+    }
+  });
+</script>

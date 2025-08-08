@@ -1,0 +1,171 @@
+<!-- ===== DOC 1: SIDEBAR FIXO (REUTILIZÁVEL EM TODAS AS PÁGINAS) ===== -->
+<div id="mx-side-root">
+  <style>
+    :root {
+      --mx-primary: #6c2bff;
+      --mx-bg: #f5f6fb;
+      --mx-text: #1f1f1f;
+      --mx-muted: #6b7280;
+      --mx-white: #fff;
+      --mx-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      --mx-side-w: 260px;
+    }
+    #mx-side-root * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Sidebar fixa, ocupa a altura toda */
+    .mx-side {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--mx-side-w);
+      background: var(--mx-white);
+      box-shadow: var(--mx-shadow);
+      z-index: 1000;
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mx-brand {
+      font-weight: 800;
+      color: var(--mx-text);
+      font-size: 18px;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mx-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .mx-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      color: #111827;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .mx-link:hover {
+      background: #f3f4f6;
+    }
+    .mx-link.active {
+      background: var(--mx-primary);
+      color: #fff;
+    }
+
+    .mx-spacer {
+      flex: 1;
+    }
+    .mx-user {
+      color: var(--mx-muted);
+      font-size: 12px;
+      padding: 0 12px 6px;
+    }
+    .mx-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mx-btn.secondary {
+      background: #f3f4f6;
+      color: #111;
+    }
+
+    /* Empurra o conteúdo da página para a direita da sidebar */
+    body {
+      background: var(--mx-bg);
+    }
+    body.mx-with-side {
+      padding-left: var(--mx-side-w);
+    }
+    @media (max-width: 960px) {
+      :root {
+        --mx-side-w: 220px;
+      }
+      body.mx-with-side {
+        padding-left: var(--mx-side-w);
+      }
+    }
+  </style>
+
+  <aside class="mx-side" aria-label="Menu da Área de Membros">
+    <div class="mx-brand">Datamize</div>
+
+    <nav class="mx-nav">
+      <a href="/members/deals/" class="mx-link" data-match="/members/deals/">🗂️ <span>Meus negócios</span></a>
+      <a href="/members/tutorials/" class="mx-link" data-match="/members/tutorials/">🗂️ <span>Meus tutoriais</span></a>
+      <a href="/members/profile/" class="mx-link" data-match="/members/profile/">👤 <span>Meu perfil</span></a>
+    </nav>
+
+    <div class="mx-spacer"></div>
+
+    <div class="mx-user"><span id="mx-user-email">—</span></div>
+    <button id="mx-logout" class="mx-btn secondary">Sair</button>
+  </aside>
+</div>
+
+<!-- Supabase SDK (carrega uma vez por página) -->
+<script data-skip-moving="true" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-skip-moving="true">
+  /* ===== Config do projeto (AJUSTE AQUI) ===== */
+  const MX_SUPABASE_URL = "https://khwttbscnemvunywcepu.supabase.co";
+  const MX_SUPABASE_ANON = "COLE_SUA_ANON_KEY_AQUI";
+  const MX_LOGIN_URL = "https://datamize24.bitrix24.site/"; /* página pública de login */
+
+  /* Aplica padding do body para não ficar sob a sidebar */
+  document.body.classList.add("mx-with-side");
+
+  /* Cria o client uma única vez e compartilha em window */
+  if (!window.supabaseClient) {
+    window.supabaseClient = supabase.createClient(MX_SUPABASE_URL, MX_SUPABASE_ANON, {
+      global: { headers: { apikey: MX_SUPABASE_ANON, Authorization: `Bearer ${MX_SUPABASE_ANON}` } },
+    });
+  }
+
+  /* Marca link ativo pelo pathname */
+  (function markActive() {
+    const here = location.pathname.replace(/\/+$/, "") + "/";
+    document.querySelectorAll(".mx-link").forEach((a) => {
+      const pattern = a.getAttribute("data-match");
+      if (here.startsWith(pattern)) a.classList.add("active");
+    });
+  })();
+
+  /* Guard de sessão + header do usuário */
+  (async function guard() {
+    try {
+      const {
+        data: { session },
+      } = await window.supabaseClient.auth.getSession();
+      if (!session) {
+        location.href = MX_LOGIN_URL;
+        return;
+      }
+      document.getElementById("mx-user-email").textContent = session.user?.email || "—";
+    } catch (_) {
+      /* se der erro de rede, deixa seguir para não travar a página */
+    }
+  })();
+
+  /* Logout */
+  document.getElementById("mx-logout")?.addEventListener("click", async () => {
+    try {
+      await window.supabaseClient.auth.signOut();
+    } finally {
+      location.href = MX_LOGIN_URL;
+    }
+  });
+</script>
+<!-- ===== FIM DO DOC 1 (Sidebar) ===== -->
